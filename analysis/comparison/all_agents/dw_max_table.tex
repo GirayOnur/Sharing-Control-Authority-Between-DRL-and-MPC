@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+\centering
+\caption{Mean $\pm$ standard deviation of maximum queue constraint violation ($\Delta w_{\max}$, veh) across all experimental runs.}
+\label{tab:dw_max_comparison}
+\begin{tabular}{lcccc}
+\toprule
+Controller & Scenario 1 & Scenario 2 & Scenario 3 & Scenario 4 \\
+\midrule
+No~Control & $224.802$ & $224.625 \pm 15.859$ & $224.802$ & $224.625 \pm 15.859$ \\
+PI-ALINEA & $135.429 \pm 38.197$ & $120.879 \pm 49.514$ & $199.333 \pm 34.189$ & $164.077 \pm 67.203$ \\
+Hier.~MPC & $0.000 \pm 0.000$ & $0.000 \pm 0.000$ & $171.625 \pm 13.844$ & $171.907 \pm 16.467$ \\
+DDPG-MPC & $10.690 \pm 13.244$ & $31.925 \pm 43.415$ & $49.430 \pm 62.255$ & $104.539 \pm 146.574$ \\
+SAC-MPC & $206.020 \pm 47.767$ & $188.925 \pm 26.002$ & $319.746 \pm 101.847$ & $370.347 \pm 134.245$ \\
+SAC(D)-MPC & $155.987 \pm 3.417$ & $155.148 \pm 15.133$ & $195.010 \pm 8.188$ & $201.260 \pm 38.845$ \\
+\bottomrule
+\end{tabular}
+\end{table}

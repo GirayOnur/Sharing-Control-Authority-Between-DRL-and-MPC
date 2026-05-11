@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+\centering
+\caption{Mean $\pm$ standard deviation of total input variation (TV) across all experimental runs.}
+\label{tab:tv_comparison}
+\begin{tabular}{lcccc}
+\toprule
+Controller & Scenario 1 & Scenario 2 & Scenario 3 & Scenario 4 \\
+\midrule
+No~Control & $0.0000$ & $0.0000$ & $0.0000$ & $0.0000$ \\
+PI-ALINEA & $42.4124 \pm 32.2287$ & $38.3165 \pm 27.1588$ & $55.1620 \pm 35.9010$ & $65.0803 \pm 37.2353$ \\
+Hier.~MPC & $7.1722 \pm 0.0899$ & $7.2195 \pm 0.2262$ & $12.4885 \pm 1.0313$ & $13.0679 \pm 1.3245$ \\
+DDPG-MPC & $6.9443 \pm 1.5294$ & $10.4368 \pm 3.1885$ & $10.6636 \pm 5.6154$ & $17.6348 \pm 7.3288$ \\
+SAC-MPC & $44.3003 \pm 5.9190$ & $43.3112 \pm 4.3084$ & $53.6586 \pm 7.1257$ & $50.1797 \pm 4.4078$ \\
+SAC(D)-MPC & $2.6008 \pm 0.5142$ & $2.7933 \pm 0.4118$ & $3.0398 \pm 0.5630$ & $3.6942 \pm 0.6778$ \\
+\bottomrule
+\end{tabular}
+\end{table}

@@ -1,0 +1,7 @@
+*.m text eol=lf
+*.tex text eol=lf
+*.svg text eol=lf
+*.md text eol=lf
+*.mat binary
+*.mlx binary
+*.fig binary
