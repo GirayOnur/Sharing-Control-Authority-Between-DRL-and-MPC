@@ -1,7 +1,7 @@
 function x_n = fun_benchmark_RM_nd(x,u,k,param,scenario,demands)
-% Same step function as fun_benchmark_RM, except the demand is read out of a
-% precomputed noisy profile instead of the analytic demand functions.
-% demands holds one series per origin and class, indexed by simulation step.
+% Same equations as fun_benchmark_RM, except the demand is read from a
+% precomputed noisy profile instead of the nominal demand functions.
+% demands holds one series per origin and class, indexed by sampling step.
 
 v_control_max = param.v_control_max;
 v_min = param.v_min;
@@ -101,8 +101,8 @@ rm_1 = u(2); %ramp metering rate for the 1st onramp
 rm_2 = u(3); %ramp metering rate for the 2nd onramp
 
 %%%
-%theta is the share each class has of this segment, used by the two class
-%speed equation. It is recomputed per segment further down.
+%theta is the fraction of the traffic volume held by each class in this
+%segment. It is recomputed per segment further down.
 theta_1_1_c1 = rho_1_1_c1/rho_1_1_tot;
 theta_1_1_c2 = rho_1_1_c2/rho_1_1_tot;
 
@@ -143,7 +143,7 @@ rho_1_3_c2_n = calc_rho_m_i_n(rho_1_3_c2,q_1_2_c2,q_1_3_c2,param,'l3');
 
 rho_1_3_tot_n = rho_1_3_c1_n + rho_1_3_c2_n;
 
-rho_1_4_tot = (rho_2_1_tot.^2 + rho_4_1_tot.^2) / (rho_2_1_tot + rho_4_1_tot);  %density the last shared segment sees downstream: a weighted average of the two branches, so the busier one dominates
+rho_1_4_tot = (rho_2_1_tot.^2 + rho_4_1_tot.^2) / (rho_2_1_tot + rho_4_1_tot);  %virtual downstream density for the last segment of the mainstream link, from the first segments of both leaving links
 
 v_1_3_c1_n = calc_v_m_i_n(v_1_3_c1,rho_1_3_tot,v_1_2_c1,rho_1_4_tot,v_control_max,0,v_min,theta_1_3_c1,theta_1_3_c2,param,'c_1','l3');
 v_1_3_c2_n = calc_v_m_i_n(v_1_3_c2,rho_1_3_tot,v_1_2_c2,rho_1_4_tot,v_control_max,0,v_min,theta_1_3_c1,theta_1_3_c2,param,'c_2','l3');
@@ -156,7 +156,8 @@ q_1_3_c2_n = rho_1_3_c2_n*v_1_3_c2_n*param.lambda.l3;
 theta_2_1_c1 = rho_2_1_c1/rho_2_1_tot;
 theta_2_1_c2 = rho_2_1_c2/rho_2_1_tot;
 
-%Route 1 gets the fraction sr of the flow leaving 1_3, route 2 gets 1-sr.
+%The primary route gets the fraction sr of the flow leaving the mainstream
+%link at the node, the secondary route gets 1-sr.
 rho_2_1_c1_n = calc_rho_m_i_n(rho_2_1_c1,sr_c1*q_1_3_c1,q_2_1_c1,param,'l4');
 rho_2_1_c2_n = calc_rho_m_i_n(rho_2_1_c2,sr_c2*q_1_3_c2,q_2_1_c2,param,'l4');
 
@@ -171,8 +172,8 @@ q_2_1_c2_n = rho_2_1_c2_n*v_2_1_c2_n*param.lambda.l4;
 %%%
 %
 
-%On-ramp 2 merges into this segment, so its flow is added to the inflow
-%and also passed to calc_v_m_i_n as the merging term.
+%On-ramp O2 merges into this segment, so its outflow is added to the
+%inflow and also passed to calc_v_m_i_n as the merging speed-drop term.
 q_3_1_c1_in = q_o_2_c1 + q_2_1_c1;
 q_3_1_c2_in = q_o_2_c2 + q_2_1_c2;
 
@@ -192,7 +193,7 @@ q_3_1_c2_n = rho_3_1_c2_n*v_3_1_c2_n*param.lambda.l5;
 
 %%%
 
-rho_out_tot = param.rho_crit;  %downstream boundary: traffic leaves the network at critical density
+rho_out_tot = param.rho_crit;  %downstream boundary at destination D1: traffic leaves at critical density
 
 theta_3_2_c1 = rho_3_2_c1/rho_3_2_tot;
 theta_3_2_c2 = rho_3_2_c2/rho_3_2_tot;

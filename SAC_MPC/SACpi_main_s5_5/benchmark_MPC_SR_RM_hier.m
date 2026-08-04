@@ -1,6 +1,7 @@
-%One experiment run of the hierarchical MPC baseline: MPC on both levels,
-%the fast one metering the ramps and the slow one setting the split rate.
-%Neither level knows what the other will do, they only see its last action.
+%One evaluation simulation of the hierarchical MPC framework: two coupled
+%MPC controllers, the low-level one computing the ramp metering rates and
+%the high-level one the vehicle split rate. Each level predicts the other's
+%inputs from its most recent trajectory, shifted by one step.
 
 %clear
 %clc
@@ -63,7 +64,8 @@ for i=1:N
 end
 
 %Saved before the metrics below are computed, so the .mat holds the raw
-%states xx and inputs uu. The comparison plotters recompute TTS from those.
+%state trajectory xx and input trajectory uu. The comparison scripts
+%recompute the evaluation metrics from those.
 mpc_result_doc_name = 'MPC_RM_SR_hier_result_' + string(datetime('now'), 'yyyy-MM-dd hh_mm_ss') + '.mat';
 save(mpc_result_doc_name)
 

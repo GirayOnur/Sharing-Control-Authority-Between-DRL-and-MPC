@@ -1,7 +1,8 @@
 function x_norm = calc_x_norm()
-% Scaling for the 75 network states before they go into the neural network:
-% speeds and densities by 100, flows and queues by 1000. Without this the
-% flow states would dominate the input purely because of their units.
+% Constant scaling vector that normalizes the 75 network states before they
+% enter the DRL observation. Speed, density and queue states are divided by
+% 100 and flow states by 1000, so that the components have similar orders
+% of magnitude and training is more stable.
 
 x_norm  =   [100;...
         100;...

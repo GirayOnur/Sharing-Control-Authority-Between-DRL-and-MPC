@@ -1,9 +1,12 @@
 function v_m_i_n = calc_v_m_i_n(v_m_i,rho_m_i,v_m_im1,rho_m_ip1,v_control,q_o,v_min,theta_m_i_c1,theta_m_i_c2,param,c_i,l_i)
-% METANET speed update for one class in one segment. The terms are:
-%   1. relaxation towards the desired speed for the current density
-%   2. convection: speed carried in from the segment upstream
-%   3. anticipation: drivers reacting to the density downstream
-%   4. the slowdown caused by vehicles merging in from an on-ramp (q_o)
+% Segment mean speed update for one vehicle class. The terms are:
+%   1. relaxation towards the interpolated speed-density relationship
+%   2. convection from the upstream segment
+%   3. anticipation of the downstream density
+%   4. the speed drop from merging on-ramp traffic, applied only on links
+%      that carry an on-ramp (q_o is zero elsewhere)
+% param.tau, param.nu, param.kappa and param.delta are tau_c, eta_c,
+% kappa_c and sigma_c of the model.
 % Note the merging term sits outside the max(), so the result can end up
 % below v_min when the ramp flow is large.
 

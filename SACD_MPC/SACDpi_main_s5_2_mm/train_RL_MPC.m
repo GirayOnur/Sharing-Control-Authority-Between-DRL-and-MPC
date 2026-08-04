@@ -1,10 +1,10 @@
 
 %Prepares what the training needs and then starts it.
 %
-%In the plain folders that means running the network 60 steps without
-%control and storing the resulting state as net_init.mat, which is where
-%every training episode begins. In the noisy demand folders it means
-%sampling the demand functions into base_demands.mat instead.
+%For the nominal demand scenarios that means running the initialization
+%period and storing the resulting state as net_init.mat, the point every
+%training episode starts from. For the noisy demand scenarios it means
+%sampling the nominal demand profiles into base_demands.mat instead.
 clear
 clc
 
@@ -18,8 +18,9 @@ N = 900;
 
 x=zeros(75,1);
 
-%Warm-up: run the network with no control until congestion has built up,
-%then store that state as the starting point of every training episode.
+%Initialization period: 10 min under the no-control setting, with the split
+%rate at 0.5 and both ramps unrestricted. The resulting congested state is
+%the starting point of every training episode.
 N_init = 60;
 xx_init = zeros(size(x,1),N_init);
 

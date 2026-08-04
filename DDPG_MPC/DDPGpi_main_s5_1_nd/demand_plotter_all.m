@@ -1,5 +1,6 @@
-%Plots the base demand of all origins and classes in one figure, the version
-%used in the paper. Index 62:962 skips the 60 warm-up steps.
+%Plots the nominal demand profiles of all origins and classes in one
+%figure, the version used in the paper. Index 62:962 skips the
+%initialization period.
 
 kf = 900;
 scenario = 3;

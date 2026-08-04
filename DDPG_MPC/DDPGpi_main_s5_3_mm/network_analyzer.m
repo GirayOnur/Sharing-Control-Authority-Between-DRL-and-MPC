@@ -111,9 +111,10 @@
 % hold off
 
 
-%Prints how far each queue went past its limit (200, 100, 100 veh).
-%Queue 1 is halved because origin 1 feeds 4 lanes while the limit is set
-%per 2 lanes, the same factor 2 that demando1.m applies to the demand.
+%Prints the queue length limit exceedance at each origin, against the
+%limits of 200 veh at O1 and 100 veh at each on-ramp. The value at O1 is
+%halved to undo the factor 2 that demando1.m applies to the mainstream
+%demand for the four-lane link.
 %Everything above is old plotting code, left commented out.
 fprintf("\n Queue 1 violation is %0.3f", (max( xx(64,:) +  xx(65,:))-200)/2);
 fprintf("\n Queue 2 violation is %0.3f", (max( xx(68,:) +  xx(69,:))-100));

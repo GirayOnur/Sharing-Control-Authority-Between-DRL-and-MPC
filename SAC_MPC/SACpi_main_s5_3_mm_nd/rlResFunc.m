@@ -1,10 +1,10 @@
 function [initialObservation, initialState] = rlResFunc
-% Episode reset. Every episode starts from a network that has already run
-% 60 steps without control, so the agent always begins in congested traffic
-% rather than on an empty road.
+% Episode reset. Every episode starts from the state reached after the
+% 10 min initialization period under the no-control setting, so training
+% always begins from a congested network.
 
-%Noisy demand runs draw a new noise realisation for every episode, so the
-%warm-up has to be redone here instead of being loaded from file.
+%Under noisy demands a new noise realization is drawn every episode, so the
+%initialization is rerun here instead of being loaded from file.
 base_demands = load('base_demands.mat');
 
 Demands.o1c1 = calc_noisy_demands('o1','c1',base_demands.base_demand_o1c1);

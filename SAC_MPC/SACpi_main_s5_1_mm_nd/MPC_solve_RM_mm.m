@@ -1,9 +1,11 @@
 function u_mpc = MPC_solve_RM_mm(x0,u0,u_rm_prev,u_sr,k,param,MPC_param_low,MPC_param_high,scenario)
-% Low level MPC: picks the metering rate of both on-ramps. Runs once every
-% M steps (1 min) over a 10 step horizon.
+% Low-level MPC controller of the hierarchical MPC framework: computes the
+% two ramp metering rates every T_l = 60 s over a prediction horizon of
+% Np = 10 low-level steps.
 %
-% The split rate coming from the high level is passed in as u_sr and held
-% fixed while predicting, so this level optimises the ramps only.
+% In its prediction, the vehicle split rate is taken from the most recent
+% high-level trajectory (u_sr), shifted one step with the terminal value
+% duplicated, so this level optimizes the ramp metering rates only.
 
 %rng('default')
 
@@ -22,19 +24,20 @@ k_opt = MPC_param_low.N_multi_start;
 w_con = param.w_con;
 
 %options = optimoptions(@fmincon,'Algorithm','sqp','Display','off', 'MaxIterations', 6, 'TolFun',1e-2, 'TolX',1e-2);
-%Loose tolerances and a small iteration cap on purpose: this solve happens
-%hundreds of times per experiment, so accuracy is traded for speed.
+%Optimality, step and constraint tolerances are set to 1e-2 to trade
+%computational accuracy for efficiency, since this problem is solved at
+%every control step of the simulation.
 options = optimoptions(@fmincon,'Algorithm','sqp','Display','off', 'TolFun',1e-2, 'TolX',1e-2, 'TolCon', 1e-2, 'MaxIterations', 6);
 
-lb = repmat([0;0],1,Nc);  %one rate per ramp per control step
+lb = repmat([0;0],1,Nc);  %one metering rate per on-ramp per control step
 ub = repmat([1;1],1,Nc);
 
 fun = @(u_mpc) J_calc(x0, u_mpc, k, Nc, Np, M, u_rm_prev, u_sr,Nc_high, Np_high, M_high, r_cost, s_cost, param, scenario);
 nonlcon = @(u_mpc) x_con(x0, u_mpc, k, w_con, Nc, Np, M,u_sr, Nc_high, Np_high, M_high, param, scenario);
 
-%Multi-start. SQP only finds a local minimum, so the problem is solved from
-%several starting points: the shifted previous solution, both bounds, then
-%random guesses. The best of them is used.
+%Multi-start strategy. The problem is nonconvex, so SQP is run from several
+%initializations: the shifted previous solution, both bounds, then random
+%guesses. The best candidate is kept.
 fval = nan(1,k_opt);
 u_opt = cell(1,k_opt);
 feas = ones(1,k_opt);
@@ -58,8 +61,9 @@ parfor i=1:k_opt
     end
 end
 
-%Prefer a solution fmincon called feasible. If none of them is, fall back to
-%the cheapest one anyway so the simulation can carry on.
+%Under hard constraints the multi-start prioritizes candidates that fmincon
+%reported feasible. If none is feasible, the cheapest candidate is applied
+%so the simulation can carry on.
 feasind = find(feas == 1);
 
 if isempty(feasind)
@@ -83,10 +87,10 @@ end
 function J = J_calc(x,u,k,Nc,Np,M,u0_1,u_sr,Nc_high,Np_high,M_high,r_cost,s_cost,param,scenario)
     k_obj = k;
     u1 = [u0_1, u];
-    %Penalty on changing the control action, so it does not jump around.
-    %u0_1 is the action currently applied, which is why it is put in front.
-    %Penalty on changing the control action, so it does not jump around.
-    %u0_1 is the action currently applied, which is why it is put in front.
+    %Quadratic penalty on fluctuations between consecutive control inputs.
+    %u0_1 is the input currently applied, which is why it is put in front.
+    %Quadratic penalty on fluctuations between consecutive control inputs.
+    %u0_1 is the input currently applied, which is why it is put in front.
     u_diff = u1(:,2:end) - u1(:,1:end-1);  
     u_pen = r_cost.*sum(sum(u_diff.^2));
     
@@ -98,10 +102,12 @@ function J = J_calc(x,u,k,Nc,Np,M,u0_1,u_sr,Nc_high,Np_high,M_high,r_cost,s_cost
     u_seq_high = repelem(u_Np_high,1,M_high);
     
     u_seq = [u_seq_high;u_seq_low];
-    %Roll the network forward over the whole prediction horizon and keep every
-    %state, since the cost and the constraints are evaluated over all of them.
-    %Roll the network forward over the whole prediction horizon and keep every
-    %state, since the cost and the constraints are evaluated over all of them.
+    %Predict the network states at every sampling step of the horizon, not just
+    %at the control steps, so the objective and the constraints are evaluated
+    %on the full trajectory.
+    %Predict the network states at every sampling step of the horizon, not just
+    %at the control steps, so the objective and the constraints are evaluated
+    %on the full trajectory.
     x_seq = zeros(size(x,1),Np*M);
 
     for i=1:Np*M
@@ -148,12 +154,12 @@ w_o_3_c1 = x_seq(72,:);
 w_o_3_c2 = x_seq(73,:);
 
     
-    %TTS (total time spent): vehicles on the road, density * lanes * length,
-    %plus the vehicles waiting in the three origin queues, summed over the
-    %horizon and over both classes. This is what the controllers minimise.
-    %TTS (total time spent): vehicles on the road, density * lanes * length,
-    %plus the vehicles waiting in the three origin queues, summed over the
-    %horizon and over both classes. This is what the controllers minimise.
+    %TTS (total time spent): vehicles on the network, density * lanes * segment
+    %length, plus the vehicles waiting in the three origin queues, summed over
+    %the prediction horizon and both vehicle classes.
+    %TTS (total time spent): vehicles on the network, density * lanes * segment
+    %length, plus the vehicles waiting in the three origin queues, summed over
+    %the prediction horizon and both vehicle classes.
     tts = sum(param.T.*((rho_1_1_c1.*param.lambda.l1 + rho_1_2_c1.*param.lambda.l2 + rho_1_3_c1.*param.lambda.l3...
     + rho_2_1_c1.*param.lambda.l4 + rho_3_1_c1.*param.lambda.l5 + rho_3_2_c1.*param.lambda.l6...
     + rho_4_1_c1.*param.lambda.l7 + rho_5_1_c1.*param.lambda.l8 + rho_5_2_c1.*param.lambda.l9).*param.L_m+w_o_1_c1+w_o_2_c1+w_o_3_c1)...
@@ -173,8 +179,8 @@ end
 
 
 %%%
-%Hard constraint: at every predicted step the queue at each origin has to
-%stay below w_con. fmincon gets it as c <= 0.
+%Queue length limits as hard constraints: at every predicted sampling step
+%the queue at each origin has to stay below w_con. fmincon gets c <= 0.
 function [c,ceq] = x_con(x,u,k,w_con,Nc,Np,M,u_sr,Nc_high,Np_high,M_high,param,scenario)
     ceq = [];
     %c = [];

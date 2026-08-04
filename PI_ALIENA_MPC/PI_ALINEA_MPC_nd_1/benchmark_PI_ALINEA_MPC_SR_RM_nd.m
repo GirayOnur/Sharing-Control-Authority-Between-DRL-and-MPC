@@ -1,14 +1,16 @@
-%One experiment run of the PI-ALINEA + MPC controller: PI-ALINEA meters the
-%ramps, the MPC sets the route guidance split rate. Same structure as the
-%DRL-MPC run, with the agent replaced by the feedback law.
+%One evaluation simulation of the state-feedback-MPC (SF-MPC) framework:
+%the PI-ALINEA state-feedback controller computes the ramp metering rates
+%at the low level and the MPC controller the vehicle split rate at the high
+%level. Same structure as the DRL-MPC run with the policy replaced by the
+%feedback law.
 
 %clear
 %clc
 
 %rng(10)
 
-%Gains come from the Bayesian tuning run of this folder. The block above
-%is an older hand-picked set, left in place as a fallback.
+%Parameters come from the Bayesian optimization run of this folder. The
+%block above is an older hand-picked set, left in place as a fallback.
 load("Bayes_opt_PI_ALINEA_nd_result_2025-09-08 08_02_44.mat")
 
 optimVals = bestPoint(optimResults);
@@ -48,10 +50,10 @@ Demands.o3c2 = calc_noisy_demands('o3','c2',base_demands.base_demand_o3c2);
 
 k = 0;
 for i=1:60
-    %PI-ALINEA needs the density of the previous control step, so it is stored
-    %here already during the warm-up.
-    %PI-ALINEA needs the density of the previous control step, so it is stored
-    %here already during the warm-up.
+    %PI-ALINEA needs the bottleneck density of the previous control step, so it
+    %is already stored during the initialization period.
+    %PI-ALINEA needs the bottleneck density of the previous control step, so it
+    %is already stored during the initialization period.
     if mod(k,param_MPC_low.M) == 0
         x_prev = x;
     end    

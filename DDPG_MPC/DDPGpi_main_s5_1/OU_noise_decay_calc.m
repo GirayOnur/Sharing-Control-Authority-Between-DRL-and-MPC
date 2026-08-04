@@ -1,5 +1,5 @@
-%Works out where the exploration noise ends up after a full training run,
-%for the decay rate set in const_RL.m. Handy before starting a long training.
+%Works out the standard deviation the exploration noise ends at after a full
+%training run, for the decay rate set in const_RL.m.
 
 tot_episode = 3500;
 step_per_episode = 150;

@@ -1,16 +1,16 @@
 function [nextObs,reward,isDone,nextInfo] = rlStepFunc(action,info,agent) %(action,state,agent)
-% One environment step for the agent, which lasts M simulation steps (1 min).
-% The agent's action is the pair of ramp metering rates and is held over all
-% of them. The high level MPC is re-solved whenever its own slower control
-% step comes up.
+% One low-level control step of the training environment, lasting m_l = 6
+% network sampling steps (T_l = 60 s). The action is the pair of ramp
+% metering rates and is held over all of them. The high-level MPC controller
+% is re-solved whenever a high-level control step falls in the interval.
 %
 % state carries more than the observation, because the environment has to
-% remember things the agent does not see:
+% remember what the agent does not see:
 %   1:75   network states
 %   76:81  demands at the three origins, both classes
-%   82:83  ramp rates applied in the previous step
-%   84     split rate currently applied by the MPC
-%   85     simulation step, 86 scenario
+%   82:83  ramp metering rates applied in the previous step
+%   84     vehicle split rate currently applied by the MPC controller
+%   85     sampling step, 86 scenario
 %   87:88  previous MPC solution, reused as the warm start
 
 %In the noisy demand runs the environment also has to carry the demand
@@ -41,8 +41,8 @@ for i=1:MPC_param.M
 end
 
 
-%The MPC control step is slower than the agent's, so the split rate is
-%only re-solved once every M_high simulation steps.
+%The high-level control step is slower than the low-level one, so the
+%vehicle split rate is only recomputed every m_h sampling steps.
 if mod(k,MPC_param_high.M) == 0
     u_mpc = MPC_solve_SR_w_RL(x,u_mpc_0,mpc_action,rl_actions,k,param,MPC_param,MPC_param_high,scenario,agent,demands);
     u_mpc_0 = [u_mpc(:,2:end),u_mpc(:,end)];
@@ -113,14 +113,14 @@ w_o_2_c2 = xx(69,:);
 w_o_3_c1 = xx(72,:);
 w_o_3_c2 = xx(73,:);
 
-    %Reward is minus the cost the MPC minimises, so both levels chase the same
-    %thing: time spent, plus a penalty for changing the ramp rates, plus a
-    %queue penalty. The /30 only keeps the numbers in a range the critic
-    %handles well.
-    %Reward is minus the cost the MPC minimises, so both levels chase the same
-    %thing: time spent, plus a penalty for changing the ramp rates, plus a
-    %queue penalty. The /30 only keeps the numbers in a range the critic
-    %handles well.
+    %The reward mirrors the MPC objective so that both levels work towards the
+    %same goal: TTS, a penalty on changing the ramp metering rates with weight
+    %r_cost, and the queue violation penalty. The constant 1/30 scaling of the
+    %reward improves learning stability.
+    %The reward mirrors the MPC objective so that both levels work towards the
+    %same goal: TTS, a penalty on changing the ramp metering rates with weight
+    %r_cost, and the queue violation penalty. The constant 1/30 scaling of the
+    %reward improves learning stability.
     u_pen  = MPC_param.r_cost.*sum((rl_actions - action).^2); 
     tts = sum(param.T.*((rho_1_1_c1.*param.lambda.l1 + rho_1_2_c1.*param.lambda.l2 + rho_1_3_c1.*param.lambda.l3...
     + rho_2_1_c1.*param.lambda.l4 + rho_3_1_c1.*param.lambda.l5 + rho_3_2_c1.*param.lambda.l6...
@@ -132,17 +132,19 @@ w_o_3_c2 = xx(73,:);
     %q_pen = sum(max(0,(w_o_1_c1+w_o_1_c2) - param.w_con(1)).^2 + max(0,(w_o_2_c1+w_o_2_c2) - param.w_con(2)).^2 ...
                 %+ max(0,(w_o_3_c1+w_o_3_c2) - param.w_con(3)).^2);
 
-    %Queue penalty: a flat charge plus a term that grows with the queue, and
-    %only when a limit is actually crossed.
-    %Queue penalty: a flat charge plus a term that grows with the queue, and
-    %only when a limit is actually crossed.
+    %Queue violation penalty, charged per origin whose maximum queue over this
+    %control step exceeds its limit: a constant penalty of 10 plus the maximum
+    %queue divided by the scaling factor 100.
+    %Queue violation penalty, charged per origin whose maximum queue over this
+    %control step exceeds its limit: a constant penalty of 10 plus the maximum
+    %queue divided by the scaling factor 100.
     q_pen= (10 + max(w_o_1_c1+w_o_1_c2)./100).*(max((w_o_1_c1+w_o_1_c2)-param.w_con(1))>0) + (10 + max(w_o_2_c1+w_o_2_c2)./100).*(max((w_o_2_c1+w_o_2_c2)-param.w_con(2))>0) + (10 + max(w_o_3_c1+w_o_3_c2)./100).*(max((w_o_3_c1+w_o_3_c2)-param.w_con(3))>0);
     
     reward = -(tts + u_pen + q_pen)./30;
 
     %reward = -(tts + u_pen + q_pen/MPC_param.Np); %scale q_pen since it only considers the max values instead of considering values at each time step
 
-%60 warm-up steps plus 900 simulated steps ends the episode.
+%The 60 initialization steps plus 900 simulated steps end the episode.
 if k>959
     isDone=true;
 else

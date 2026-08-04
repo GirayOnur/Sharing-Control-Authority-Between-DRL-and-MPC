@@ -1,8 +1,9 @@
-%One experiment run of the DRL-MPC controller: the trained agent meters the
-%two on-ramps, the MPC sets the route guidance split rate.
+%One evaluation simulation of the DRL-MPC framework: the trained DRL agent
+%computes the ramp metering rates at the low level and the MPC controller
+%the vehicle split rate at the high level.
 %
 %Called by run_10_experiments.m, which repeats it 10 times with different
-%rng seeds. The seed changes the random multi-start guesses of the MPC.
+%rng seeds. The seed changes the random initializations of the multi-start.
 
 %clear
 %clc
@@ -36,14 +37,14 @@ end
 
 agent_mat = load("agent_2025-08-19 02_42_32.mat");
 agent = agent_mat.agent;
-%SACD: take the mean of the policy instead of sampling from it, so the
-%trained SAC agent behaves deterministically during the test runs.
+%SACD: use the mean of the stochastic policy instead of sampling from it,
+%so the trained SAC agent acts deterministically during deployment.
 agent.UseExplorationPolicy = false;
 
 % agent_mat = load("Agent3400.mat");
 % agent = agent_mat.saved_agent;
 
-%Start from an even split and both ramps fully open.
+%Start from an even vehicle split rate and unrestricted on-ramps.
 u_mpc_sr = repmat([0.5],1,param_MPC_high.Nc);
 u_mpc_sr_0 = u_mpc_sr;
 u_mpc_sr_prev = u_mpc_sr(:,1);
@@ -51,10 +52,10 @@ u_rl = [1;1];
 k_c = 0;
 
 for i=1:N
-    %Low level control step: ask the agent for the ramp rates. Only the
-    %controller calls are timed, the plant simulation is not.
-    %Low level control step: ask the agent for the ramp rates. Only the
-    %controller calls are timed, the plant simulation is not.
+    %Low-level control step: the DRL agent computes the ramp metering rates.
+    %Only the controller calls are timed, the simulation itself is not.
+    %Low-level control step: the DRL agent computes the ramp metering rates.
+    %Only the controller calls are timed, the simulation itself is not.
     if mod(k_c,param_MPC_low.M) == 0
         [demando1c1,demando1c2]  = demando1(k-1,scenario);
         [demando2c1,demando2c2]  = demando2(k-1,scenario);
@@ -69,10 +70,14 @@ for i=1:N
         u_rl = u_low{1};
     end
 
-    %High level control step: re-solve the MPC for the split rate. The
-    %solution is shifted one step to warm start the next solve.
-    %High level control step: re-solve the MPC for the split rate. The
-    %solution is shifted one step to warm start the next solve.
+    %High-level control step: the MPC controller recomputes the vehicle split
+    %rate. Following the receding-horizon strategy only the first input of the
+    %solution is applied, and the sequence is shifted to warm start the next
+    %solve.
+    %High-level control step: the MPC controller recomputes the vehicle split
+    %rate. Following the receding-horizon strategy only the first input of the
+    %solution is applied, and the sequence is shifted to warm start the next
+    %solve.
     if mod(k_c,param_MPC_high.M) == 0
         tic
         u_mpc_sr = MPC_solve_SR_w_RL_h(x,u_mpc_sr_0,u_mpc_sr_prev,u_rl,k,param_sim,param_MPC_low,param_MPC_high,scenario,agent);
@@ -81,10 +86,10 @@ for i=1:N
         u_mpc_sr_prev = u_mpc_sr(:,1);
     end
 
-    %Only the first action of each solution is applied, then the network is
-    %advanced by one step.
-    %Only the first action of each solution is applied, then the network is
-    %advanced by one step.
+    %Apply the current low-level and high-level inputs and advance the network
+    %by one sampling step.
+    %Apply the current low-level and high-level inputs and advance the network
+    %by one sampling step.
     x = fun_benchmark_RM(x,[u_mpc_sr(:,1);u_rl],k,param_sim,scenario);
     xx(:,i) = x;
     uu(:,i) = [u_mpc_sr(:,1);u_rl];
@@ -93,7 +98,8 @@ for i=1:N
 end
 
 %Saved before the metrics below are computed, so the .mat holds the raw
-%states xx and inputs uu. The comparison plotters recompute TTS from those.
+%state trajectory xx and input trajectory uu. The comparison scripts
+%recompute the evaluation metrics from those.
 mpc_result_doc_name = 'RL_MPC_SR_RM_result_' + string(datetime('now'), 'yyyy-MM-dd hh_mm_ss') + '.mat';
 save(mpc_result_doc_name)
 

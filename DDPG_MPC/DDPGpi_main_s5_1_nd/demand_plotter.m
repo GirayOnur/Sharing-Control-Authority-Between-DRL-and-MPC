@@ -1,6 +1,6 @@
-%Plots the demand of one origin over the simulation. The filter only smooths
-%the one minute steps for the figure, it does not change the demand used in
-%the experiments.
+%Plots the demand profile of one origin over the simulation. The filter
+%only smooths the one minute steps for the figure, it does not change the
+%demand used in the simulations.
 
 
 

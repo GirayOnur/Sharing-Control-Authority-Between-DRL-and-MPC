@@ -1,7 +1,10 @@
 function [obj,con,info] = bayes_cost_PI_ALINEA_MPC(pi_alinea_params)
-% Objective for the PI-ALINEA tuning. Runs one full experiment with the
-% given gains and returns the cost of it: time spent, plus the penalty on
-% changing the ramp rates, plus a penalty for exceeding the queue limits.
+% Bayesian optimization objective for the PI-ALINEA parameters. Runs one
+% full simulation with the given parameters and returns the soft objective
+% cost (SOC): TTS, plus the quadratic penalty on changes of the ramp
+% metering rates, plus the quadratic queue length violation penalty. The
+% vehicle split rate is left out of the input penalty because the high-level
+% MPC controller already penalizes its variation.
 
 scenario = 3;
 N = 900; %total simulation steps

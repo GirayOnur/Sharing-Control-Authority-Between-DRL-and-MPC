@@ -1,6 +1,6 @@
-%Sanity check that base_demands.mat lines up with the analytic demand
-%functions: the stored profile is read at k+1, the functions at k-1, so both
-%curves should land on top of each other.
+%Sanity check that base_demands.mat lines up with the nominal demand
+%functions: the stored profile is read at k+1 and the functions at k-1, so
+%both curves should land on top of each other.
 clear
 clc
 scenario = 3;

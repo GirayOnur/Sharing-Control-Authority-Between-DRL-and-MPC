@@ -1,8 +1,9 @@
-%Builds the RL agent and the training environment, then trains it.
-%Started from train_RL_MPC.m, which sets up the starting point first.
+%Builds the DRL agent and the training environment, then trains it.
+%Started from train_RL_MPC.m, which prepares the starting point first.
 %
-%What the agent controls: the two ramp metering rates. The split rate stays
-%with the MPC, which is re-solved inside the environment step function.
+%The agent computes the high-frequency control inputs, the two ramp
+%metering rates. The vehicle split rate stays with the high-level MPC
+%controller, which is re-solved inside the environment step function.
 
 %Constructs RL components:
 %RL Algorithm: SAC
@@ -104,8 +105,8 @@ for ci=1:2
 end
 
 
-%The agent is handed to the step function because the MPC solved in there
-%needs to query it over the prediction horizon.
+%The agent is handed to the step function because the MPC controller solved
+%in there evaluates the policy over its prediction horizon.
 StepHandle = @(Action,Info) rlStepFunc(Action, Info, agent);
 ResetHandle = @() rlResFunc;
 
@@ -116,8 +117,8 @@ env = rlFunctionEnv(ObsInfo,ActInfo,StepHandle,ResetHandle);
 %parpool("Processes",availableGPUs);
 
 
-%150 agent steps per episode x 6 simulation steps each = 900 steps, which
-%is one full scenario.
+%150 low-level control steps per episode x m_l = 6 sampling steps each
+%= 900 sampling steps, one full 2.5 h simulation.
 opt = rlTrainingOptions('MaxEpisodes',3500,...
                                           'MaxStepsPerEpisode',150,'UseParallel',true,...
                                           'SaveAgentCriteria','EpisodeFrequency',...

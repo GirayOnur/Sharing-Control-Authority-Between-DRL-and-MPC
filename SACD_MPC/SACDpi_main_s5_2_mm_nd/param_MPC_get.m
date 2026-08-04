@@ -1,11 +1,12 @@
 function MPC_param = param_MPC_get(is_low_level)
-% MPC tuning. is_low_level = 1 returns the settings of the fast ramp
-% metering controller, 0 the settings of the slow route guidance one.
+% MPC settings. is_low_level = 1 returns the low-level (ramp metering)
+% controller, 0 the high-level (vehicle split rate) controller.
 %
-% M is how many simulation steps one control step lasts, so with T = 10 s
-% the low level acts every minute and the high level every five minutes.
-% Np*M is the same for both (60 steps = 10 min), so they look equally far
-% ahead. N_multi_start is how many starting points fmincon is run from.
+% M is m_l or m_h, the number of network sampling steps in one control
+% step. With T = 10 s that puts the low-level control time step at
+% T_l = 60 s and the high-level one at T_h = 300 s. The prediction horizon
+% Np covers the same 600 s on both levels. N_multi_start is the number of
+% initializations of the multi-start strategy.
 
 if is_low_level == 1
     MPC_param.Np = 10;
@@ -21,7 +22,7 @@ else
 
 end
 
-MPC_param.r_cost= 0.4;  %penalty on changing the ramp rates
-MPC_param.s_cost = 0.4;  %penalty on changing the split rate
+MPC_param.r_cost= 0.4;  %penalty weight on ramp metering rate changes
+MPC_param.s_cost = 0.4;  %penalty weight on vehicle split rate changes
 end
 

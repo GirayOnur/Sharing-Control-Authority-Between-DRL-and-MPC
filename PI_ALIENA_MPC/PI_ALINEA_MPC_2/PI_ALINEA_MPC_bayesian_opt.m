@@ -5,8 +5,8 @@ clc
 
 rng(2)
 
-%Two gains and one target density per ramp. The ranges below are the
-%search space, not the tuned values.
+%Two gains and one desired density per on-ramp. The ranges below are the
+%search space, restricted to the regions found effective in trial runs.
 var1 = optimizableVariable(K_P1=[0,15]);
 var2 = optimizableVariable(K_P2=[0,15]);
 var3 = optimizableVariable(K_I1=[0,4]);
@@ -18,8 +18,9 @@ optimVars = [var1,var2,var3,var4,var5,var6];
 
 objFun = @(params) bayes_cost_PI_ALINEA_MPC(params);
 
-%Runs for at most 4 hours rather than a fixed number of evaluations,
-%because one evaluation is a full 900 step simulation.
+%Bounded by runtime rather than a number of evaluations, since a single
+%evaluation is a full 2.5 h simulation. The budget is matched to the
+%average DRL training time for a fair comparison.
 optimResults = bayesopt(objFun,optimVars,'MaxObjectiveEvaluations', inf, 'MaxTime', 14400 , UseParallel=true, PlotFcn=[], Verbose=0);
 
 opt_result_doc_name = 'Bayes_opt_PI_ALINEA_result_' + string(datetime('now'), 'yyyy-MM-dd hh_mm_ss') + '.mat';

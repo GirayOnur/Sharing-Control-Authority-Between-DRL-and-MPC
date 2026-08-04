@@ -1,6 +1,6 @@
-%Runs the benchmark in this folder 10 times, with seed 1 to 10, and writes
-%the console output to a diary file. The lines that are commented out pick a
-%different controller; keep only one of them active.
+%Runs the 10 evaluation simulations of this folder, with seed 1 to 10, and
+%writes the console output to a diary file. The commented out lines pick a
+%different control framework; keep only one of them active.
 
 diary experiments_no_control
 for i=1:10

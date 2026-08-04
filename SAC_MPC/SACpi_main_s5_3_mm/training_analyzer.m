@@ -1,5 +1,5 @@
-%Plots the training curve of a saved agent: average reward per episode and
-%the critic's estimate of the return at the start of each episode (Q0).
+%Plots the learning curve of a saved agent: the average return per episode
+%and the critic's estimate of the return at the start of each episode (Q0).
 %Point it at the agent .mat file you want to look at.
 
 agent_mat = load("agent_2025-06-26 02_47_45.mat");

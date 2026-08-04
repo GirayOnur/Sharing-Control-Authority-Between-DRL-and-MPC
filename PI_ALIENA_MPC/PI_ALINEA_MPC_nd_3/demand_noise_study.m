@@ -1,5 +1,5 @@
-%Plots a base demand against its noisy version, to see how large the noise in
-%the _nd scenarios actually is.
+%Plots a nominal demand profile against its noisy version, to check the
+%size of the noise used in scenarios 2 and 4.
 
 
 base_demands = load('base_demands.mat');

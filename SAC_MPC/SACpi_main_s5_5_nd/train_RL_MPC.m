@@ -1,10 +1,10 @@
 
 %Prepares what the training needs and then starts it.
 %
-%In the plain folders that means running the network 60 steps without
-%control and storing the resulting state as net_init.mat, which is where
-%every training episode begins. In the noisy demand folders it means
-%sampling the demand functions into base_demands.mat instead.
+%For the nominal demand scenarios that means running the initialization
+%period and storing the resulting state as net_init.mat, the point every
+%training episode starts from. For the noisy demand scenarios it means
+%sampling the nominal demand profiles into base_demands.mat instead.
 clear
 clc
 
@@ -16,7 +16,7 @@ N_demand = 1030;
 
 %Noisy demand runs: sample the demand functions once and store the result
 %as base_demands.mat. rlResFunc adds fresh noise to it every episode.
-%The warm-up state is not stored here, it is redone inside rlResFunc.
+%The initialization state is not stored here, it is redone inside rlResFunc.
 base_demand_o1c1 = nan(1,N_demand);
 base_demand_o1c2 = nan(1,N_demand);
 base_demand_o2c1 = nan(1,N_demand);

@@ -1,8 +1,9 @@
 function [demand_c1, demand_c2] = demando1(k,scenario)
-% Demand at this origin over time, split into the two vehicle classes.
-% k is the simulation step and is first mapped onto the demand time scale:
-% the first 60 steps are the warm-up (k<0 below) and after that the demand
-% changes once every 6 steps, i.e. every minute.
+% Nominal demand profile at this origin, split over the two vehicle
+% classes. k is the network sampling step and is first mapped onto the
+% demand time scale: the first 60 steps are the initialization period
+% (k<0 below) and after that the demand changes every 6 steps, i.e. every
+% minute.
 % k=k-1;
 k=floor((k-60)/6);
 switch scenario

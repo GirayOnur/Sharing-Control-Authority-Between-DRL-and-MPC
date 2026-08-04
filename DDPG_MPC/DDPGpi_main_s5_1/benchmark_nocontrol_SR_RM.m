@@ -1,6 +1,6 @@
-%One experiment run with no control at all: the split rate stays at 0.5 and
-%both ramps stay fully open. This is the reference the others are compared
-%against.
+%One evaluation simulation of the no-control case: a constant vehicle split
+%rate of 0.5 and both ramp metering rates at 1, so vehicles are divided
+%evenly over the two routes and the on-ramp flows are not restricted.
 
 %clear
 %clc

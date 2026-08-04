@@ -1,9 +1,9 @@
 function [noisy_demand] = calc_noisy_demands(o_ind,c_ind,base_demand)
-% Builds a noisy demand profile out of a base one. White noise is added and
-% then low-pass filtered, so the demand drifts the way real traffic does
-% instead of jumping around from step to step.
-% Each origin and class gets its own noise size; origin 1 carries most of
-% the traffic so it gets the largest one.
+% Builds a noisy demand profile from a nominal one, for scenarios 2 and 4.
+% Zero-mean Gaussian noise is added with an origin- and class-specific
+% standard deviation, (200,50,40,10,40,10) over (O1,O2,O3) x (class 1,
+% class 2), and the result is smoothed with a third-order low-pass
+% Butterworth filter with a normalized cutoff frequency of 0.1.
 
 scale_o1c1 = 200;
 scale_o1c2 = 50;

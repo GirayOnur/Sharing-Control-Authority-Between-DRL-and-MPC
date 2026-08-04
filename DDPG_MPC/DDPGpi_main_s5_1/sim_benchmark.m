@@ -1,6 +1,6 @@
-%Old single class version of the simulation, kept for reference only.
-%It calls fun_benchmark, which is no longer part of this repo, so it does not
-%run as is.
+%Old single-class version of the simulation, kept for reference only. It
+%calls fun_benchmark, which is no longer part of this repository, so it does
+%not run as is.
 clear
 clc
 

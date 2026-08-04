@@ -1,9 +1,10 @@
 function [initialObservation, initialState] = rlResFunc
-% Episode reset. Every episode starts from a network that has already run
-% 60 steps without control, so the agent always begins in congested traffic
-% rather than on an empty road.
+% Episode reset. Every episode starts from the state reached after the
+% 10 min initialization period under the no-control setting, so training
+% always begins from a congested network.
 
-%That warm-up was done once by train_RL_MPC.m and stored in net_init.mat.
+%That initialization was run once by train_RL_MPC.m and stored in
+%net_init.mat.
 net_init_vals = load('net_init.mat');
 xx = net_init_vals.x;
 uu = net_init_vals.u;

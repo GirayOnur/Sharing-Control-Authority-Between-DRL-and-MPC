@@ -1,26 +1,31 @@
 function x_n = fun_benchmark_RM(x,u,k,param,scenario)
-% One simulation step of the traffic network (METANET). This is the plant:
-% the benchmark scripts use it to advance the real network, and the MPC uses
-% it to predict.
+% One network sampling step of the multi-class METANET model. It is used
+% both as the simulator of the real freeway network and as the prediction
+% model of the MPC controllers.
 %
-% Network layout:
+% Benchmark freeway network:
 %
-%                                        o2
+%                                        O2
 %                                         v
-%                     +--> [2_1] --> [3_1 3_2] --> out   route 1
-%   o1 --> [1_1 1_2 1_3]
-%                     +--> [4_1] --> [5_1 5_2] --> out   route 2
+%                     +--> [2_1] --> [3_1 3_2] --+
+%   O1 --> [1_1 1_2 1_3]                         +--> D1
+%                     +--> [4_1] --> [5_1 5_2] --+
 %                                         ^
-%                                        o3
+%                                        O3
 %
-% The split rate decides how the flow leaving 1_3 is divided over the two
-% routes; o2 and o3 are the metered on-ramps.
+% A mainstream link of three four-lane segments fed by mainstream origin
+% O1, splitting into a primary route (on-ramp O2) and a secondary route
+% (on-ramp O3) of three two-lane segments each, both ending at the single
+% destination D1. The vehicle split rate at the node divides the flow
+% leaving segment 1_3 over the two routes.
 %
-% Every segment carries two vehicle classes and keeps 7 states (speed and
-% density per class, total density, flow per class). Each origin keeps a
-% queue and a flow per class. That is 9*7 + 3*4 = 75 states.
+% Every segment carries two vehicle classes and keeps 7 states (mean speed
+% and density per class, total density, outflow per class). Every origin
+% keeps a queue length and an outflow per class. That is 9*7 + 3*4 = 75
+% states.
 %
-% u = [split rate; ramp 1 rate; ramp 2 rate], all in [0,1].
+% u = [vehicle split rate; ramp 1 metering rate; ramp 2 metering rate],
+% all in [0,1] and applied to both vehicle classes.
 
 v_control_max = param.v_control_max;
 v_min = param.v_min;
@@ -120,8 +125,8 @@ rm_1 = u(2); %ramp metering rate for the 1st onramp
 rm_2 = u(3); %ramp metering rate for the 2nd onramp
 
 %%%
-%theta is the share each class has of this segment, used by the two class
-%speed equation. It is recomputed per segment further down.
+%theta is the fraction of the traffic volume held by each class in this
+%segment. It is recomputed per segment further down.
 theta_1_1_c1 = rho_1_1_c1/rho_1_1_tot;
 theta_1_1_c2 = rho_1_1_c2/rho_1_1_tot;
 
@@ -162,7 +167,7 @@ rho_1_3_c2_n = calc_rho_m_i_n(rho_1_3_c2,q_1_2_c2,q_1_3_c2,param,'l3');
 
 rho_1_3_tot_n = rho_1_3_c1_n + rho_1_3_c2_n;
 
-rho_1_4_tot = (rho_2_1_tot.^2 + rho_4_1_tot.^2) / (rho_2_1_tot + rho_4_1_tot);  %density the last shared segment sees downstream: a weighted average of the two branches, so the busier one dominates
+rho_1_4_tot = (rho_2_1_tot.^2 + rho_4_1_tot.^2) / (rho_2_1_tot + rho_4_1_tot);  %virtual downstream density for the last segment of the mainstream link, from the first segments of both leaving links
 
 v_1_3_c1_n = calc_v_m_i_n(v_1_3_c1,rho_1_3_tot,v_1_2_c1,rho_1_4_tot,v_control_max,0,v_min,theta_1_3_c1,theta_1_3_c2,param,'c_1','l3');
 v_1_3_c2_n = calc_v_m_i_n(v_1_3_c2,rho_1_3_tot,v_1_2_c2,rho_1_4_tot,v_control_max,0,v_min,theta_1_3_c1,theta_1_3_c2,param,'c_2','l3');
@@ -175,7 +180,8 @@ q_1_3_c2_n = rho_1_3_c2_n*v_1_3_c2_n*param.lambda.l3;
 theta_2_1_c1 = rho_2_1_c1/rho_2_1_tot;
 theta_2_1_c2 = rho_2_1_c2/rho_2_1_tot;
 
-%Route 1 gets the fraction sr of the flow leaving 1_3, route 2 gets 1-sr.
+%The primary route gets the fraction sr of the flow leaving the mainstream
+%link at the node, the secondary route gets 1-sr.
 rho_2_1_c1_n = calc_rho_m_i_n(rho_2_1_c1,sr_c1*q_1_3_c1,q_2_1_c1,param,'l4');
 rho_2_1_c2_n = calc_rho_m_i_n(rho_2_1_c2,sr_c2*q_1_3_c2,q_2_1_c2,param,'l4');
 
@@ -190,8 +196,8 @@ q_2_1_c2_n = rho_2_1_c2_n*v_2_1_c2_n*param.lambda.l4;
 %%%
 %
 
-%On-ramp 2 merges into this segment, so its flow is added to the inflow
-%and also passed to calc_v_m_i_n as the merging term.
+%On-ramp O2 merges into this segment, so its outflow is added to the
+%inflow and also passed to calc_v_m_i_n as the merging speed-drop term.
 q_3_1_c1_in = q_o_2_c1 + q_2_1_c1;
 q_3_1_c2_in = q_o_2_c2 + q_2_1_c2;
 
@@ -211,7 +217,7 @@ q_3_1_c2_n = rho_3_1_c2_n*v_3_1_c2_n*param.lambda.l5;
 
 %%%
 
-rho_out_tot = param.rho_crit;  %downstream boundary: traffic leaves the network at critical density
+rho_out_tot = param.rho_crit;  %downstream boundary at destination D1: traffic leaves at critical density
 
 theta_3_2_c1 = rho_3_2_c1/rho_3_2_tot;
 theta_3_2_c2 = rho_3_2_c2/rho_3_2_tot;

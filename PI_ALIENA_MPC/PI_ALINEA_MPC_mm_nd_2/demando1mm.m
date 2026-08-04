@@ -1,7 +1,8 @@
 function [demand_c1, demand_c2] = demando1mm(k,scenario)
-% Demand the controller assumes in the _mm runs. Same shape as demandoN.m
-% but without the sine ripple and shifted by a constant, so the controller
-% predicts the wrong demand on purpose.
+% Estimated demand profile used as the demand prediction of the MPC
+% controllers under model mismatch (scenarios 3 and 4). Same shape as the
+% nominal profile in demandoN.m, without the sine ripple and offset by a
+% constant, so the prediction deviates from the real demand.
 % k=k-1;
 k=floor((k-60)/6);
 switch scenario

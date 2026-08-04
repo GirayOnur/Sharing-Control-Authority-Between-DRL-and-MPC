@@ -1,7 +1,7 @@
 function param_esti = param_get_mm
-% Parameters the controller believes are true. rho_crit, rho_max, a_m and
-% v_free are deliberately off, which is the model mismatch the _mm folders
-% test. Everything else matches param_get.
+% Perturbed parameter values used in the MPC prediction model under model
+% mismatch (scenarios 3 and 4). rho_crit, rho_max, a_m and v_free differ
+% from the real values; everything else matches param_get.
 
 param_esti.rho_crit = 38.5;
 param_esti.T = 10/3600;

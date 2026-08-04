@@ -1,6 +1,6 @@
-%Compares one control input over time between two saved runs, by default an
-%RL-MPC run against a hierarchical MPC one. Set the file names to runs that
-%exist in this folder.
+%Compares one control input over time between two saved simulations, by
+%default a DRL-MPC run against a hierarchical MPC one. Set the file names to
+%results that exist in this folder.
 
 uind = 2; %1 -> SR, 2 -> RM1, 3 -> RM2
 
