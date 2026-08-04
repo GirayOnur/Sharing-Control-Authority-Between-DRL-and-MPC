@@ -1,4 +1,4 @@
-# Sharing the Control Task Between Deep Reinforcement Learning and Model Predictive Control: Application to Multi-Class Transportation Networks
+# Sharing the Control Authority Between Deep Reinforcement Learning and Model Predictive Control: Application to Multi-Class Transportation Networks
 
 Source code for the case study of the paper. The DRL-MPC framework divides the
 control inputs between a DRL agent and an MPC controller: the MPC controller
