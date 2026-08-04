@@ -130,10 +130,7 @@ The scripts in `plots/comparison` read the result files out of the experiment
 folders and produce the figures and LaTeX tables for the evaluation metrics:
 TTS, the total and maximum queue length constraint violation, the total input
 variation, the soft objective cost and the total computation time.
-
-- `all_agents/` all four control frameworks in all four scenarios
-
-They expect the experiment folders directly in the repository root.
+`all_agents/` compares all four control frameworks in all four scenarios
 
 Each experiment folder also has `network_analyzer.m`, which prints the queue
 length limit exceedance, `training_analyzer.m` for a
