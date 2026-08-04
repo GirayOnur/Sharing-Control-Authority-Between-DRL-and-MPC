@@ -40,8 +40,8 @@ on the queues.
 | SF-MPC | PI-ALINEA | MPC |
 | Hierarchical MPC | MPC | MPC |
 | DDPG-MPC | DDPG agent | MPC |
-| SAC-MPC | SAC agent | MPC |
-| SACD-MPC | same SAC agent, deterministic | MPC |
+| SAC-MPC | SAC agent, stochastic | MPC |
+| SACD-MPC | SAC agent, deterministic | MPC |
 
 The point of the DRL and PI-ALINEA versions is that the route guidance MPC does
 not assume the ramp controller is frozen. It steps the agent (or the PI-ALINEA
