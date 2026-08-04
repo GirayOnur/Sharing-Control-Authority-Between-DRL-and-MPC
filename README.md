@@ -4,13 +4,11 @@ Source code for the case study of the paper. The DRL-MPC framework divides the
 control inputs between a DRL agent and an MPC controller: the MPC controller
 sits at the high level and computes the low-frequency control inputs, while the
 DRL agent sits at the low level and computes the high-frequency ones. That way
-MPC keeps its built-in optimization and constraint handling on the inputs it has
-time to compute, and DRL covers the inputs that have to be updated too often for
-MPC.
+MPC keeps its built-in optimization and constraint handling on the inputs, and 
+DRL covers the inputs that have to be updated at high frequency.
 
-Everything is MATLAB. The freeway network is simulated with the multi-class
-METANET model, and the MPC problems are solved with `fmincon`, not the MPC
-Toolbox.
+The freeway network is simulated with the multi-class METANET model, and the MPC 
+problems are solved with `fmincon` function of MATLAB.
 
 ## The case study
 
@@ -52,9 +50,7 @@ vehicles at O1 and 100 at each on-ramp.
 | SAC-MPC | SAC agent, stochastic | MPC |
 | SACD-MPC | SAC agent, deterministic | MPC |
 
-The last three are the proposed DRL-MPC framework, trained with DDPG and SAC.
-
-In DRL-MPC and SF-MPC, the high-level MPC controller evaluates the low-level
+In DDPG-MPC, SAC-MPC, SACD-MPC and SF-MPC, the high-level MPC controller evaluates the low-level
 controller inside its own prediction, so the predicted ramp metering rates are
 the ones that will actually be applied. The hierarchical MPC controller instead
 reuses the most recent low-level trajectory, shifted by one step, because
