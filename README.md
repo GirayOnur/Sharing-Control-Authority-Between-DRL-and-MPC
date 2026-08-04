@@ -105,8 +105,7 @@ and `benchmark_*.m` for one evaluation simulation.
 ## Running
 
 Needs MATLAB with the Optimization, Reinforcement Learning, Statistics and
-Machine Learning, Signal Processing and Parallel Computing toolboxes. Without
-the last one everything still runs, only slower. The MPC Toolbox is not needed.
+Machine Learning, Signal Processing and Parallel Computing toolboxes.
 
 The trained agents, the tuned PI-ALINEA parameters and the initial states are
 all in the repository, so nothing has to be retrained. `cd` into an experiment
@@ -114,20 +113,14 @@ folder and run the benchmark script in it, for example
 `benchmark_RL_MPC_SR_RM`. For the 10 evaluation simulations with seeds 1 to 10
 and a diary of the output, use `run_10_experiments`.
 
-It is slow. Every MPC control step solves a nonconvex problem from several
-initializations, and there are 900 sampling steps per simulation.
-
 Results are saved next to the script as `<framework>_result_<timestamp>.mat`.
 They hold the raw state trajectory `xx` and input trajectory `uu`; the
-evaluation metrics are recomputed from those by the comparison scripts, they
-are not stored.
+evaluation metrics are recomputed from those by the comparison scripts.
 
 ## Training
 
 `train_RL_MPC` prepares the starting point and then runs `const_RL.m`, which
-builds the agent and trains it. This takes hours, mostly because the high-level
-MPC problem is solved inside the training environment, so every low-level
-control step also solves an optimization problem. During training the MPC
+builds the agent and trains it. During training the MPC
 controller uses a soft penalty on the queue length limits rather than hard
 constraints, to avoid infeasibility while the policy is still poor.
 
@@ -141,13 +134,9 @@ variation, the soft objective cost and the total computation time.
 - `all_agents/` all four control frameworks in all four scenarios
 - `single_agent/` one agent per algorithm
 - `multi_agents/` the spread across the five trained agents
-- `extra_experiments/` agents trained under nominal demands, evaluated under
-  noisy demands
 
-They expect the experiment folders directly in the repository root, from before
-they were grouped into `DDPG_MPC/`, `SAC_MPC/` and so on. Move them back up or
-fix the paths in the scripts.
+They expect the experiment folders directly in the repository root.
 
 Each experiment folder also has `network_analyzer.m`, which prints the queue
-length limit exceedance of the last simulation, `training_analyzer.m` for a
+length limit exceedance, `training_analyzer.m` for a
 learning curve, and `demand_plotter.m` for a demand profile.
