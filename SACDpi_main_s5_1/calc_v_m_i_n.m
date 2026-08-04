@@ -1,9 +1,0 @@
-function v_m_i_n = calc_v_m_i_n(v_m_i,rho_m_i,v_m_im1,rho_m_ip1,v_control,q_o,v_min,theta_m_i_c1,theta_m_i_c2,param,c_i,l_i)
-
-v_m_i_n = max(v_min, v_m_i + (param.T/param.tau)*(calc_V_tilde_rho_m_i(rho_m_i,theta_m_i_c1,theta_m_i_c2,v_control,param,c_i)-v_m_i)...
-                + (param.T/param.L_m)*v_m_i*(v_m_im1 - v_m_i)...
-                - (param.nu*param.T)/(param.tau*param.L_m)*(rho_m_ip1 - rho_m_i)/(rho_m_i + param.kappa))...
-                - (param.delta*param.T*q_o*v_m_i)/(param.L_m*param.lambda.(l_i)*(rho_m_i+param.kappa));
-
-end
-

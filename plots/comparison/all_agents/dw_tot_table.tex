@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+\centering
+\caption{Mean $\pm$ standard deviation of total queue constraint violation ($\Delta w_{\mathrm{tot}}$, veh) across all experimental runs.}
+\label{tab:dw_tot_comparison}
+\begin{tabular}{lcccc}
+\toprule
+Controller & Scenario 1 & Scenario 2 & Scenario 3 & Scenario 4 \\
+\midrule
+No~Control & $39544.953$ & $39278.236 \pm 5738.286$ & $39544.953$ & $39278.236 \pm 5738.286$ \\
+SF-MPC & $13336.270 \pm 5700.792$ & $11385.385 \pm 6763.867$ & $27961.384 \pm 8864.116$ & $19476.956 \pm 11091.410$ \\
+Hier.~MPC & $0.000 \pm 0.000$ & $0.000 \pm 0.000$ & $17631.803 \pm 2681.177$ & $17925.915 \pm 3443.247$ \\
+DDPG-MPC & $418.910 \pm 614.951$ & $1441.503 \pm 2362.551$ & $3189.160 \pm 4780.715$ & $19824.731 \pm 30339.666$ \\
+SAC-MPC & $32365.038 \pm 11903.165$ & $27223.191 \pm 6879.223$ & $66975.736 \pm 31189.581$ & $74454.618 \pm 29352.775$ \\
+SACD-MPC & $16949.212 \pm 860.597$ & $16510.853 \pm 3433.514$ & $27269.548 \pm 1754.121$ & $27226.210 \pm 5644.648$ \\
+\bottomrule
+\end{tabular}
+\end{table}

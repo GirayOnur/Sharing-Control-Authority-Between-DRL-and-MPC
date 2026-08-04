@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+\centering
+\caption{Mean $\pm$ standard deviation of the soft objective cost (SOC = $u_{\mathrm{pen}} + \mathrm{TTS} + q_{\mathrm{pen}}$) across all experimental runs.}
+\label{tab:obj_comparison}
+\begin{tabular}{lcccc}
+\toprule
+Controller & Scenario 1 & Scenario 2 & Scenario 3 & Scenario 4 \\
+\midrule
+No~Control & $5449674.82$ & $5472840.42 \pm 1173346.56$ & $5449674.82$ & $5472840.42 \pm 1173346.56$ \\
+SF-MPC & $1423730.77 \pm 802338.00$ & $1188888.51 \pm 906364.98$ & $4083963.31 \pm 2029247.18$ & $2371483.06 \pm 2002214.73$ \\
+Hier.~MPC & $2453.85 \pm 0.60$ & $2449.99 \pm 24.28$ & $2172167.84 \pm 469670.26$ & $2229598.07 \pm 657164.55$ \\
+DDPG-MPC & $11966.52 \pm 16111.98$ & $82337.25 \pm 198246.30$ & $351366.82 \pm 665021.21$ & $4758506.40 \pm 7837097.25$ \\
+SAC-MPC & $4419768.42 \pm 2945216.78$ & $3303239.68 \pm 1124694.21$ & $16066589.49 \pm 13323373.49$ & $18999183.61 \pm 12855975.45$ \\
+SACD-MPC & $1856492.95 \pm 133795.18$ & $1784913.33 \pm 473575.10$ & $3367958.32 \pm 310040.47$ & $3440691.92 \pm 1003603.10$ \\
+\bottomrule
+\end{tabular}
+\end{table}

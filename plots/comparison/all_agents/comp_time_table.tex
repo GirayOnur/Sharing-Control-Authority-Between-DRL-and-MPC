@@ -1,0 +1,17 @@
+\begin{table}[htbp]
+\centering
+\caption{Mean $\pm$ standard deviation of total controller computation time (s) across all experimental runs for each controller and scenario.}
+\label{tab:comp_time_comparison}
+\begin{tabular}{lcccc}
+\toprule
+Controller & Scenario 1 & Scenario 2 & Scenario 3 & Scenario 4 \\
+\midrule
+No~Control & $0.0$ & $0.0$ & $0.0$ & $0.0$ \\
+SF-MPC & $30.5 \pm 1.9$ & $29.0 \pm 2.2$ & $27.7 \pm 1.0$ & $27.9 \pm 1.2$ \\
+Hier.~MPC & $1778.9 \pm 3.7$ & $1736.7 \pm 5.1$ & $1638.2 \pm 33.0$ & $1659.3 \pm 39.2$ \\
+DDPG-MPC & $55.8 \pm 3.5$ & $52.9 \pm 2.3$ & $54.6 \pm 2.8$ & $54.3 \pm 2.3$ \\
+SAC-MPC & $53.5 \pm 11.9$ & $57.7 \pm 4.2$ & $34.2 \pm 11.6$ & $29.6 \pm 9.9$ \\
+SAC(D)-MPC & $76.9 \pm 2.6$ & $78.8 \pm 3.1$ & $62.4 \pm 1.8$ & $64.9 \pm 2.1$ \\
+\bottomrule
+\end{tabular}
+\end{table}
