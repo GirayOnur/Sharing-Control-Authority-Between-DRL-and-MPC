@@ -132,8 +132,6 @@ TTS, the total and maximum queue length constraint violation, the total input
 variation, the soft objective cost and the total computation time.
 
 - `all_agents/` all four control frameworks in all four scenarios
-- `single_agent/` one agent per algorithm
-- `multi_agents/` the spread across the five trained agents
 
 They expect the experiment folders directly in the repository root.
 
